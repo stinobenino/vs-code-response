@@ -25,8 +25,8 @@
 </div>
 
 <script>
-    // De juiste basis-URL zonder /rest/v1/ aan het einde
-    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co";
+    // De juiste basis-URL en API key gekoppeld aan jouw Supabase project
+    const SUPABASE_URL = "https://supabase.co";
     const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -37,31 +37,31 @@
     const resultaatTitel = document.getElementById("resultaat-titel");
     const resultaatTekst = document.getElementById("resultaat-tekst");
 
-    // Haal de specifieke opdracht live op uit de cloud database
     async function haalUitlegOp() {
         try {
-            // Dit weggewiste stukje code is nu volledig hersteld:
+            // Vraag de specifieke opdracht op aan de database
             const response = await fetch(`${SUPABASE_URL}/rest/v1/opdrachten?naam=eq.${encodeURIComponent(opdrachtInput)}`, {
                 headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
             });
             const data = await response.json();
 
+            // HERSTELD: Controleer of er daadwerkelijk een opdracht is gevonden in de lijst (data.length > 0)
             if (data && data.length > 0) {
-                const item = data[0];
+                const item = data[0]; // Pak specifiek de eerste rij uit de database
                 const uitlegVeld = item[`s${stapInput}_uitleg`];
                 const titelVeld = item[`s${stapInput}_titel`];
 
                 resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > ${titelVeld}:`;
                 resultaatTekst.innerText = uitlegVeld || "Geen specifieke uitleg ingevoerd voor deze stap.";
-                resultaatBox.style.borderLeftColor = "#a6e3a1"; 
+                resultaatBox.style.borderLeftColor = "#a6e3a1"; // Groene balk voor succes
             } else {
                 resultaatTitel.innerText = "[ERROR] Opdracht niet gevonden";
-                resultaatTekst.innerText = "Deze opdracht staat niet (meer) in de online database.";
-                resultaatBox.style.borderLeftColor = "#f38ba8"; 
+                resultaatTekst.innerText = `De opdracht '${opdrachtInput}' staat helaas niet in de online database. Controleer of je de naam exact zo hebt gespeld als bij het invoeren.`;
+                resultaatBox.style.borderLeftColor = "#f38ba8"; // Rode balk voor foutmelding
             }
         } catch (error) {
             resultaatTitel.innerText = "[ERROR] Databasefout";
-            resultaatTekst.innerText = "Er kon geen verbinding worden gemaakt met de cloud.";
+            resultaatTekst.innerText = "Er kon geen stabiele verbinding worden gemaakt met de Supabase-cloud.";
             resultaatBox.style.borderLeftColor = "#f38ba8"; 
             console.error(error);
         }
@@ -69,6 +69,10 @@
 
     if (opdrachtInput && stapInput) {
         haalUitlegOp();
+    } else {
+        resultaatTitel.innerText = "[ERROR] Ongeldige parameters";
+        resultaatTekst.innerText = "Er is geen opdracht of stap meegestuurd vanuit de startpagina.";
+        resultaatBox.style.borderLeftColor = "#f38ba8";
     }
 </script>
 </body>
