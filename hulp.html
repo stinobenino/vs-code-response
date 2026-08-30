@@ -29,7 +29,7 @@
 </div>
 
 <script>
-    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co";
+    const SUPABASE_URL = "https://supabase.co";
     const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -51,7 +51,7 @@
             console.log("Supabase data ontvangen:", data);
 
             if (Array.isArray(data) && data.length > 0) {
-                // DE VOLLEDIGE FIX MET DE JUISTE INDEXERING:
+                // HIER STAAT NU ECHT DE FIX (data[0] in plaats van data):
                 const item = data[0]; 
                 
                 const uitlegVeld = item[`s${stapInput}_uitleg`];
