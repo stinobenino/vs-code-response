@@ -19,27 +19,15 @@
 <div class="container">
     <div id="resultaat" class="terminal-box">
         <strong id="resultaat-titel">[Laden...]</strong>
-        <p id="resultaat-tekst">De uitleg wordt opgebouwd...</p>
+        <p id="resultaat-tekst">De uitleg wordt live opgehaald uit de cloud...</p>
     </div>
     <a href="index.html" class="terug-knop">&larr; Volgende vraag stellen</a>
 </div>
 
 <script>
-    const standaardUitleg = {
-        "python rekenmachine": {
-            1: "Gebruik twee variabelen met 'input()' om de getallen op te vragen. Vergeet niet om er 'float()' of 'int()' omheen te zetten, anders denkt Python dat het tekst is!",
-            2: "Zet je keuzestructuur op met: if operator == '+': \n   print(getal1 + getal2)\nelif operator == '-': ...",
-            3: "Bouw een extra 'if getal2 == 0:' controle in om te waarschuwen dat delen door nul niet kan.",
-            4: "Gebruik een f-string om het antwoord mooi te presenteren: print(f'Resultaat: {uitkomst}')."
-        }
-    };
-
-    function getUitlegDatabase() {
-        const opgeslagen = localStorage.getItem("uitlegDB");
-        const customDb = opgeslagen ? JSON.parse(opgeslagen) : {};
-        // Combineer de standaard opdrachten met de handmatig toegevoegde opdrachten
-        return { ...standaardUitleg, ...customDb };
-    }
+    // PAS DEZE TWEE REGELS AAN MET JOUW EIGEN SUPABASE CODES:
+    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
     const urlParams = new URLSearchParams(window.location.search);
     const opdrachtInput = urlParams.get('opdracht')?.toLowerCase().trim();
@@ -49,17 +37,38 @@
     const resultaatTitel = document.getElementById("resultaat-titel");
     const resultaatTekst = document.getElementById("resultaat-tekst");
 
-    const db = getUitlegDatabase();
+    // Haal de specifieke opdracht live op uit de cloud database
+    async function haalUitlegOp() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/opdrachten?naam=eq.${encodeURIComponent(opdrachtInput)}`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await response.json();
 
-    if (db[opdrachtInput] && db[opdrachtInput][stapInput]) {
-        resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > Stap ${stapInput}:`;
-        resultaatTekst.innerText = db[opdrachtInput][stapInput];
-        resultaatBox.style.borderLeftColor = "#a6e3a1"; 
-    } else {
-        resultaatTitel.innerText = "[ERROR] Opdracht of stap niet herkend";
-        resultaatTekst.innerText = "We konden voor deze selectie geen specifieke uitleg vinden.";
-        resultaatBox.style.borderLeftColor = "#f38ba8"; 
+            if (data && data.length > 0) {
+                const item = data[0];
+                const uitlegVeld = item[`s${stapInput}_uitleg`];
+                const titelVeld = item[`s${stapInput}_titel`];
+
+                resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > ${titelVeld}:`;
+                resultaatTekst.innerText = uitlegVeld || "Geen specifieke uitleg ingevoerd voor deze stap.";
+                resultaatBox.style.borderLeftColor = "#a6e3a1"; 
+            } else {
+                resultaatTitel.innerText = "[ERROR] Opdracht niet gevonden";
+                resultaatTekst.innerText = "Deze opdracht staat niet (meer) in de online database.";
+                resultaatBox.style.borderLeftColor = "#f38ba8"; 
+            }
+        } catch (error) {
+            resultaatTitel.innerText = "[ERROR] Databasefout";
+            resultaatTekst.innerText = "Er kon geen verbinding worden gemaakt met de cloud.";
+            resultaatBox.style.borderLeftColor = "#f38ba8"; 
+        }
+    }
+
+    if (opdrachtInput && stapInput) {
+        haalUitlegOp();
     }
 </script>
 </body>
 </html>
+

@@ -5,77 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code-Helper Pro</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1e1e2e;
-            color: #cdd6f4;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        /* GEHEIME ONZICHTBARE KNOP IN LINKERBOVENHOEK */
-        .admin-trigger {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 40px;
-            background: transparent;
-            border: none;
-            cursor: default;
-            z-index: 9999;
-        }
-
-        .container {
-            background-color: #252538;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            max-width: 650px;
-            width: 100%;
-            border: 1px solid #313244;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; position: relative; }
+        .admin-trigger { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background: transparent; border: none; cursor: default; z-index: 9999; }
+        .container { background-color: #252538; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); max-width: 650px; width: 100%; border: 1px solid #313244; }
         h1 { color: #89b4fa; text-align: center; margin-top: 0; font-size: 28px; font-weight: 600; }
         p.subtitle { text-align: center; color: #a6adc8; margin-bottom: 30px; font-size: 16px; }
         label { display: block; margin-top: 20px; font-weight: 500; color: #cdd6f4; font-size: 15px; }
-        
-        input, select, button {
-            width: 100%; padding: 14px 18px; margin-top: 8px;
-            background-color: #181825; border: 1px solid #45475a;
-            border-radius: 8px; color: #cdd6f4; font-size: 16px;
-            box-sizing: border-box; transition: all 0.2s ease;
-        }
+        input, select, button { width: 100%; padding: 14px 18px; margin-top: 8px; background-color: #181825; border: 1px solid #45475a; border-radius: 8px; color: #cdd6f4; font-size: 16px; box-sizing: border-box; transition: all 0.2s ease; }
         input:focus, select:focus { outline: none; border-color: #89b4fa; }
-        
         .main-btn { background-color: #89b4fa; color: #11111b; font-weight: 600; border: none; margin-top: 30px; cursor: pointer; }
         .main-btn:hover { background-color: #b4befe; }
         select:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* STANDAARD VERBORGEN BEHEERDERS SCHERM */
-        .admin-panel {
-            display: none;
-            background-color: #181825;
-            border: 1px solid #f38ba8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
-        }
+        .admin-panel { display: none; background-color: #181825; border: 1px solid #f38ba8; padding: 20px; border-radius: 8px; margin-top: 30px; }
         .admin-panel h2 { color: #f38ba8; margin-top: 0; font-size: 20px; }
-        .admin-panel textarea { width: 100%; background-color: #252538; border: 1px solid #45475a; color: #cdd6f4; padding: 10px; border-radius: 6px; box-sizing: border-box; margin-top: 5px; resize: vertical; font-family: sans-serif; }
+        .admin-panel textarea { width: 100%; background-color: #252538; border: 1px solid #45475a; color: #cdd6f4; padding: 10px; border-radius: 6px; box-sizing: border-box; margin-top: 5px; resize: vertical; }
         .save-btn { background-color: #a6e3a1; color: #11111b; font-weight: 600; margin-top: 15px; cursor: pointer; }
         .save-btn:hover { background-color: #94e2d5; }
     </style>
 </head>
 <body>
 
-<!-- De onzichtbare klikbare zone -->
-<button class="admin-trigger" onclick="wisselBeheerder()" title="Geheim Beheer"></button>
+<button class="admin-trigger" onclick="wisselBeheerder()"></button>
 
 <div class="container">
     <h1>&lt;Code-Helper Pro /&gt;</h1>
@@ -91,49 +41,57 @@
 
     <button class="main-btn" onclick="stuurDoor()">Vraag Hulp Aan</button>
 
-    <!-- HET BEHEERDERSSCHERM -->
+    <!-- BEHEERDERSSCHERM -->
     <div id="adminPanel" class="admin-panel">
-        <h2>🔒 Beheerderspaneel (Nieuwe opdracht toevoegen)</h2>
-        
+        <h2>🔒 Beheerderspaneel (Live Cloud Opslag)</h2>
         <label for="new-opdracht">Naam nieuwe opdracht:</label>
         <input type="text" id="new-opdracht" placeholder="Bijv: Python Rekenmachine">
 
         <label>Stap 1 Titel & Uitleg:</label>
         <input type="text" id="s1-titel" placeholder="Titel (Bijv: Stap 1: Input vragen)">
-        <textarea id="s1-uitleg" rows="2" placeholder="Gedetailleerde uitleg voor de leerling..."></textarea>
+        <textarea id="s1-uitleg" rows="2" placeholder="Uitleg..."></textarea>
 
         <label>Stap 2 Titel & Uitleg:</label>
         <input type="text" id="s2-titel" placeholder="Titel">
-        <textarea id="s2-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+        <textarea id="s2-uitleg" rows="2" placeholder="Uitleg..."></textarea>
 
         <label>Stap 3 Titel & Uitleg:</label>
         <input type="text" id="s3-titel" placeholder="Titel">
-        <textarea id="s3-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+        <textarea id="s3-uitleg" rows="2" placeholder="Uitleg..."></textarea>
 
         <label>Stap 4 Titel & Uitleg:</label>
         <input type="text" id="s4-titel" placeholder="Titel">
-        <textarea id="s4-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+        <textarea id="s4-uitleg" rows="2" placeholder="Uitleg..."></textarea>
 
-        <button class="save-btn" onclick="opslaanOpdracht()">Opdracht Opslaan</button>
+        <button class="save-btn" onclick="opslaanOpdracht()">Opdracht Wereldwijd Opslaan</button>
     </div>
 </div>
 
 <script>
-    // Standaard ingebouwde opdrachten
-    const standaardStappen = {
-        "python rekenmachine": [
-            "Stap 1: Input van de gebruiker vragen (getallen en operator)",
-            "Stap 2: De 'if/elif/else' structuur bouwen voor de berekeningen",
-            "Stap 3: Controleren op fouten (zoals delen door 0)",
-            "Stap 4: De uitslag netjes printen in de terminal"
-        ]
-    };
+    // PAS DEZE TWEE REGELS AAN MET JOUW EIGEN SUPABASE CODES:
+    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
-    // Laad opgeslagen data of gebruik de standaard data
-    function getDatabase() {
-        const opgeslagen = localStorage.getItem("stappenDB");
-        return opgeslagen ? JSON.parse(opgeslagen) : standaardStappen;
+    let database = {};
+
+    // Haal alle opdrachten live op uit de cloud database
+    async function haalDatabaseOp() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/opdrachten`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await response.json();
+            
+            // Zet de data om naar een makkelijk formaat voor de site
+            database = {};
+            data.forEach(item => {
+                database[item.naam.toLowerCase().trim()] = item;
+            });
+        } catch (error) {
+            console.error("Database kon niet worden geladen:", error);
+        }
     }
+    haalDatabaseOp();
 
     function wisselBeheerder() {
         const panel = document.getElementById("adminPanel");
@@ -141,19 +99,22 @@
     }
 
     function updateStappen() {
-        const db = getDatabase();
         const opdrachtInput = document.getElementById("opdracht").value.toLowerCase().trim();
         const stapSelect = document.getElementById("stap");
-        
         stapSelect.innerHTML = "";
 
-        if (db[opdrachtInput]) {
+        if (database[opdrachtInput]) {
             stapSelect.disabled = false;
-            db[opdrachtInput].forEach((stapTekst, index) => {
-                const optie = document.createElement("option");
-                optie.value = index + 1;
-                optie.textContent = stapTekst;
-                stapSelect.appendChild(optie);
+            const item = database[opdrachtInput];
+            const stappen = [item.s1_titel, item.s2_titel, item.s3_titel, item.s4_titel];
+            
+            stappen.forEach((stapTekst, index) => {
+                if(stapTekst) {
+                    const optie = document.createElement("option");
+                    optie.value = index + 1;
+                    optie.textContent = stapTekst;
+                    stapSelect.appendChild(optie);
+                }
             });
         } else {
             stapSelect.disabled = true;
@@ -163,34 +124,41 @@
         }
     }
 
-    function opslaanOpdracht() {
+    async function opslaanOpdracht() {
         const naam = document.getElementById("new-opdracht").value.toLowerCase().trim();
         if(!naam) return alert("Vul een opdrachtnaam in!");
 
-        const db = getDatabase();
-        
-        // Sla de titels op voor de dropdown
-        db[naam] = [
-            document.getElementById("s1-titel").value || "Stap 1",
-            document.getElementById("s2-titel").value || "Stap 2",
-            document.getElementById("s3-titel").value || "Stap 3",
-            document.getElementById("s4-titel").value || "Stap 4"
-        ];
-        localStorage.setItem("stappenDB", JSON.stringify(db));
-
-        // Sla ook direct de uitgebreide uitleg op voor hulp.html
-        const uitlegDb = localStorage.getItem("uitlegDB") ? JSON.parse(localStorage.getItem("uitlegDB")) : {};
-        uitlegDb[naam] = {
-            1: document.getElementById("s1-uitleg").value,
-            2: document.getElementById("s2-uitleg").value,
-            3: document.getElementById("s3-uitleg").value,
-            4: document.getElementById("s4-uitleg").value
+        const payload = {
+            naam: naam,
+            s1_titel: document.getElementById("s1-titel").value || "Stap 1",
+            s1_uitleg: document.getElementById("s1-uitleg").value,
+            s2_titel: document.getElementById("s2-titel").value || "Stap 2",
+            s2_uitleg: document.getElementById("s2-uitleg").value,
+            s3_titel: document.getElementById("s3-titel").value || "Stap 3",
+            s3_uitleg: document.getElementById("s3-uitleg").value,
+            s4_titel: document.getElementById("s4-titel").value || "Stap 4",
+            s4_uitleg: document.getElementById("s4-uitleg").value
         };
-        localStorage.setItem("uitlegDB", JSON.stringify(uitlegDb));
 
-        alert("Opdracht succesvol opgeslagen!");
-        wisselBeheerder(); // Sluit paneel
-        updateStappen();
+        // Stuur de data direct naar de cloud database via de API
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/opdrachten`, {
+                method: "POST",
+                headers: { 
+                    "apikey": SUPABASE_KEY, 
+                    "Authorization": `Bearer ${SUPABASE_KEY}`,
+                    "Content-Type": "application/json",
+                    "Prefer": "resolution=merge-duplicates" // Overschrijft als opdracht al bestaat
+                },
+                body: JSON.stringify(payload)
+            });
+            alert("Opdracht succesvol en LIVE opgeslagen voor alle leerlingen!");
+            wisselBeheerder();
+            await haalDatabaseOp(); // Ververs lokale database
+            updateStappen();
+        } catch (error) {
+            alert("Er ging iets mis met opslaan.");
+        }
     }
 
     function stuurDoor() {
@@ -202,6 +170,5 @@
 </script>
 </body>
 </html>
-
 
 
