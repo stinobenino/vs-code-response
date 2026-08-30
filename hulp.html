@@ -25,8 +25,8 @@
 </div>
 
 <script>
-    // De juiste basis-URL en API key gekoppeld aan jouw Supabase project
-    const SUPABASE_URL = "https://supabase.co";
+    // Gekoppeld aan jouw Supabase project
+    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co";
     const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -45,9 +45,9 @@
             });
             const data = await response.json();
 
-            // HERSTELD: Controleer of er daadwerkelijk een opdracht is gevonden in de lijst (data.length > 0)
+            // HERSTELD: Controleer of er daadwerkelijk een opdracht is gevonden (data.length > 0)
             if (data && data.length > 0) {
-                const item = data[0]; // Pak specifiek de eerste rij uit de database
+                const item = data[0]; // GEWELDIG: pakt nu specifiek de eerste rij uit de database!
                 const uitlegVeld = item[`s${stapInput}_uitleg`];
                 const titelVeld = item[`s${stapInput}_titel`];
 
@@ -56,7 +56,7 @@
                 resultaatBox.style.borderLeftColor = "#a6e3a1"; // Groene balk voor succes
             } else {
                 resultaatTitel.innerText = "[ERROR] Opdracht niet gevonden";
-                resultaatTekst.innerText = `De opdracht '${opdrachtInput}' staat helaas niet in de online database. Controleer of je de naam exact zo hebt gespeld als bij het invoeren.`;
+                resultaatTekst.innerText = `De opdracht '${opdrachtInput}' staat helaas niet in de online database.`;
                 resultaatBox.style.borderLeftColor = "#f38ba8"; // Rode balk voor foutmelding
             }
         } catch (error) {
