@@ -68,8 +68,8 @@
 </div>
 
 <script>
-    // PAS DEZE TWEE REGELS AAN MET JOUW EIGEN SUPABASE CODES:
-    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co/rest/v1/";
+    // Correcte kortere basis-URL zodat er geen dubbele submappen ontstaan
+    const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co";
     const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
     let database = {};
@@ -82,7 +82,6 @@
             });
             const data = await response.json();
             
-            // Zet de data om naar een makkelijk formaat voor de site
             database = {};
             data.forEach(item => {
                 database[item.naam.toLowerCase().trim()] = item;
@@ -125,8 +124,10 @@
     }
 
     async function opslaanOpdracht() {
-        const naam = document.getElementById("new-opdracht").value.toLowerCase().trim();
-        if(!naam) return alert("Vul een opdrachtnaam in!");
+        const naamInput = document.getElementById("new-opdracht").value.trim();
+        if(!naamInput) return alert("Vul een opdrachtnaam in!");
+
+        const naam = naamInput.toLowerCase();
 
         const payload = {
             naam: naam,
@@ -140,7 +141,6 @@
             s4_uitleg: document.getElementById("s4-uitleg").value
         };
 
-        // Stuur de data direct naar de cloud database via de API
         try {
             await fetch(`${SUPABASE_URL}/rest/v1/opdrachten`, {
                 method: "POST",
@@ -148,15 +148,22 @@
                     "apikey": SUPABASE_KEY, 
                     "Authorization": `Bearer ${SUPABASE_KEY}`,
                     "Content-Type": "application/json",
-                    "Prefer": "resolution=merge-duplicates" // Overschrijft als opdracht al bestaat
+                    "Prefer": "resolution=merge-duplicates"
                 },
                 body: JSON.stringify(payload)
             });
+            
             alert("Opdracht succesvol en LIVE opgeslagen voor alle leerlingen!");
+            
             wisselBeheerder();
-            await haalDatabaseOp(); // Ververs lokale database
+            await haalDatabaseOp(); 
+            
+            // Nu vult de code de naam automatisch in en laadt de dropdown zonder crashes
+            document.getElementById("opdracht").value = naamInput;
             updateStappen();
+
         } catch (error) {
+            console.error(error);
             alert("Er ging iets mis met opslaan.");
         }
     }
@@ -170,5 +177,3 @@
 </script>
 </body>
 </html>
-
-
