@@ -12,6 +12,7 @@
         .terminal-box p { margin: 0; color: #cdd6f4; line-height: 1.6; font-size: 16px; white-space: pre-wrap; }
         .terug-knop { display: inline-block; padding: 12px 24px; background-color: #313244; color: #cdd6f4; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; }
         .terug-knop:hover { background-color: #45475a; }
+        .debug-box { margin-top: 20px; padding: 10px; background-color: #2e1e1e; border: 1px dashed #f38ba8; color: #f38ba8; font-family: monospace; font-size: 12px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -21,11 +22,13 @@
         <strong id="resultaat-titel">[Laden...]</strong>
         <p id="resultaat-tekst">De uitleg wordt live opgehaald uit de cloud...</p>
     </div>
+    
     <a href="index.html" class="terug-knop">&larr; Volgende vraag stellen</a>
+    
+    <div id="debug-info" class="debug-box" style="display: none;"></div>
 </div>
 
 <script>
-    // Gekoppeld aan jouw Supabase project
     const SUPABASE_URL = "https://xvqknicssgoffhdyddef.supabase.co";
     const SUPABASE_KEY = "sb_publishable_clZiwizfLZgAYIHSOyd0wA_EtOG66uB";
 
@@ -36,34 +39,42 @@
     const resultaatBox = document.getElementById("resultaat");
     const resultaatTitel = document.getElementById("resultaat-titel");
     const resultaatTekst = document.getElementById("resultaat-tekst");
+    const debugBox = document.getElementById("debug-info");
 
     async function haalUitlegOp() {
         try {
-            // Vraag de specifieke opdracht op aan de database
             const response = await fetch(`${SUPABASE_URL}/rest/v1/opdrachten?naam=eq.${encodeURIComponent(opdrachtInput)}`, {
                 headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
             });
             const data = await response.json();
 
-            // HERSTELD: Controleer of er daadwerkelijk een opdracht is gevonden (data.length > 0)
-            if (data && data.length > 0) {
-                const item = data[0]; // GEWELDIG: pakt nu specifiek de eerste rij uit de database!
+            console.log("Supabase data ontvangen:", data);
+
+            if (Array.isArray(data) && data.length > 0) {
+                // DE VOLLEDIGE FIX MET DE JUISTE INDEXERING:
+                const item = data[0]; 
+                
                 const uitlegVeld = item[`s${stapInput}_uitleg`];
                 const titelVeld = item[`s${stapInput}_titel`];
 
-                resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > ${titelVeld}:`;
+                resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > ${titelVeld || 'Stap ' + stapInput}:`;
                 resultaatTekst.innerText = uitlegVeld || "Geen specifieke uitleg ingevoerd voor deze stap.";
-                resultaatBox.style.borderLeftColor = "#a6e3a1"; // Groene balk voor succes
+                resultaatBox.style.borderLeftColor = "#a6e3a1"; 
             } else {
                 resultaatTitel.innerText = "[ERROR] Opdracht niet gevonden";
-                resultaatTekst.innerText = `De opdracht '${opdrachtInput}' staat helaas niet in de online database.`;
-                resultaatBox.style.borderLeftColor = "#f38ba8"; // Rode balk voor foutmelding
+                resultaatTekst.innerText = `De opdracht '${opdrachtInput}' is niet gevonden in de database.`;
+                resultaatBox.style.borderLeftColor = "#f38ba8"; 
+                
+                debugBox.style.display = "block";
+                debugBox.innerText = `Debug info: Gezocht naar '${opdrachtInput}'. Database stuurde dit terug: ${JSON.stringify(data)}`;
             }
         } catch (error) {
             resultaatTitel.innerText = "[ERROR] Databasefout";
-            resultaatTekst.innerText = "Er kon geen stabiele verbinding worden gemaakt met de Supabase-cloud.";
+            resultaatTekst.innerText = "Er kon geen verbinding worden gemaakt met de cloud.";
             resultaatBox.style.borderLeftColor = "#f38ba8"; 
-            console.error(error);
+            
+            debugBox.style.display = "block";
+            debugBox.innerText = `Systeemfout: ${error.message}`;
         }
     }
 
@@ -71,7 +82,7 @@
         haalUitlegOp();
     } else {
         resultaatTitel.innerText = "[ERROR] Ongeldige parameters";
-        resultaatTekst.innerText = "Er is geen opdracht of stap meegestuurd vanuit de startpagina.";
+        resultaatTekst.innerText = "Geen opdracht of stap meegegeven vanaf het startscherm.";
         resultaatBox.style.borderLeftColor = "#f38ba8";
     }
 </script>
