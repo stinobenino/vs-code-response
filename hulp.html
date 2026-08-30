@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uitleg - Code-Helper Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .container { background-color: #252538; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); max-width: 750px; width: 100%; border: 1px solid #313244; }
+        .terminal-box { padding: 25px; background-color: #11111b; border-left: 4px solid #a6e3a1; border-radius: 6px; font-family: 'Courier New', Courier, monospace; margin-bottom: 30px; }
+        .terminal-box strong { color: #a6e3a1; display: block; margin-bottom: 12px; font-size: 16px; }
+        .terminal-box p { margin: 0; color: #cdd6f4; line-height: 1.6; font-size: 16px; white-space: pre-wrap; }
+        .terug-knop { display: inline-block; padding: 12px 24px; background-color: #313244; color: #cdd6f4; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; }
+        .terug-knop:hover { background-color: #45475a; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="resultaat" class="terminal-box">
+        <strong id="resultaat-titel">[Laden...]</strong>
+        <p id="resultaat-tekst">De uitleg wordt opgebouwd...</p>
+    </div>
+    <a href="index.html" class="terug-knop">&larr; Volgende vraag stellen</a>
+</div>
+
+<script>
+    const standaardUitleg = {
+        "python rekenmachine": {
+            1: "Gebruik twee variabelen met 'input()' om de getallen op te vragen. Vergeet niet om er 'float()' of 'int()' omheen te zetten, anders denkt Python dat het tekst is!",
+            2: "Zet je keuzestructuur op met: if operator == '+': \n   print(getal1 + getal2)\nelif operator == '-': ...",
+            3: "Bouw een extra 'if getal2 == 0:' controle in om te waarschuwen dat delen door nul niet kan.",
+            4: "Gebruik een f-string om het antwoord mooi te presenteren: print(f'Resultaat: {uitkomst}')."
+        }
+    };
+
+    function getUitlegDatabase() {
+        const opgeslagen = localStorage.getItem("uitlegDB");
+        const customDb = opgeslagen ? JSON.parse(opgeslagen) : {};
+        // Combineer de standaard opdrachten met de handmatig toegevoegde opdrachten
+        return { ...standaardUitleg, ...customDb };
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const opdrachtInput = urlParams.get('opdracht')?.toLowerCase().trim();
+    const stapInput = urlParams.get('stap');
+
+    const resultaatBox = document.getElementById("resultaat");
+    const resultaatTitel = document.getElementById("resultaat-titel");
+    const resultaatTekst = document.getElementById("resultaat-tekst");
+
+    const db = getUitlegDatabase();
+
+    if (db[opdrachtInput] && db[opdrachtInput][stapInput]) {
+        resultaatTitel.innerText = `[INFO] Hulp voor ${opdrachtInput.toUpperCase()} > Stap ${stapInput}:`;
+        resultaatTekst.innerText = db[opdrachtInput][stapInput];
+        resultaatBox.style.borderLeftColor = "#a6e3a1"; 
+    } else {
+        resultaatTitel.innerText = "[ERROR] Opdracht of stap niet herkend";
+        resultaatTekst.innerText = "We konden voor deze selectie geen specifieke uitleg vinden.";
+        resultaatBox.style.borderLeftColor = "#f38ba8"; 
+    }
+</script>
+</body>
+</html>

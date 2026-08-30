@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code-Helper Pro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* GEHEIME ONZICHTBARE KNOP IN LINKERBOVENHOEK */
+        .admin-trigger {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            cursor: default;
+            z-index: 9999;
+        }
+
+        .container {
+            background-color: #252538;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            max-width: 650px;
+            width: 100%;
+            border: 1px solid #313244;
+        }
+        h1 { color: #89b4fa; text-align: center; margin-top: 0; font-size: 28px; font-weight: 600; }
+        p.subtitle { text-align: center; color: #a6adc8; margin-bottom: 30px; font-size: 16px; }
+        label { display: block; margin-top: 20px; font-weight: 500; color: #cdd6f4; font-size: 15px; }
+        
+        input, select, button {
+            width: 100%; padding: 14px 18px; margin-top: 8px;
+            background-color: #181825; border: 1px solid #45475a;
+            border-radius: 8px; color: #cdd6f4; font-size: 16px;
+            box-sizing: border-box; transition: all 0.2s ease;
+        }
+        input:focus, select:focus { outline: none; border-color: #89b4fa; }
+        
+        .main-btn { background-color: #89b4fa; color: #11111b; font-weight: 600; border: none; margin-top: 30px; cursor: pointer; }
+        .main-btn:hover { background-color: #b4befe; }
+        select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* STANDAARD VERBORGEN BEHEERDERS SCHERM */
+        .admin-panel {
+            display: none;
+            background-color: #181825;
+            border: 1px solid #f38ba8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .admin-panel h2 { color: #f38ba8; margin-top: 0; font-size: 20px; }
+        .admin-panel textarea { width: 100%; background-color: #252538; border: 1px solid #45475a; color: #cdd6f4; padding: 10px; border-radius: 6px; box-sizing: border-box; margin-top: 5px; resize: vertical; font-family: sans-serif; }
+        .save-btn { background-color: #a6e3a1; color: #11111b; font-weight: 600; margin-top: 15px; cursor: pointer; }
+        .save-btn:hover { background-color: #94e2d5; }
+    </style>
+</head>
+<body>
+
+<!-- De onzichtbare klikbare zone -->
+<button class="admin-trigger" onclick="wisselBeheerder()" title="Geheim Beheer"></button>
+
+<div class="container">
+    <h1>&lt;Code-Helper Pro /&gt;</h1>
+    <p class="subtitle">Typ je programmeeropdracht en bekijk de unieke stappen.</p>
+
+    <label for="opdracht">Welke programmeeropdracht doe je?</label>
+    <input type="text" id="opdracht" placeholder="Typ de naam van je opdracht..." oninput="updateStappen()">
+
+    <label for="stap">Bij welke specifieke stap heb je hulp nodig?</label>
+    <select id="stap" disabled>
+        <option value="">Typ hierboven eerst een bekende opdracht in...</option>
+    </select>
+
+    <button class="main-btn" onclick="stuurDoor()">Vraag Hulp Aan</button>
+
+    <!-- HET BEHEERDERSSCHERM -->
+    <div id="adminPanel" class="admin-panel">
+        <h2>🔒 Beheerderspaneel (Nieuwe opdracht toevoegen)</h2>
+        
+        <label for="new-opdracht">Naam nieuwe opdracht:</label>
+        <input type="text" id="new-opdracht" placeholder="Bijv: Python Rekenmachine">
+
+        <label>Stap 1 Titel & Uitleg:</label>
+        <input type="text" id="s1-titel" placeholder="Titel (Bijv: Stap 1: Input vragen)">
+        <textarea id="s1-uitleg" rows="2" placeholder="Gedetailleerde uitleg voor de leerling..."></textarea>
+
+        <label>Stap 2 Titel & Uitleg:</label>
+        <input type="text" id="s2-titel" placeholder="Titel">
+        <textarea id="s2-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+
+        <label>Stap 3 Titel & Uitleg:</label>
+        <input type="text" id="s3-titel" placeholder="Titel">
+        <textarea id="s3-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+
+        <label>Stap 4 Titel & Uitleg:</label>
+        <input type="text" id="s4-titel" placeholder="Titel">
+        <textarea id="s4-uitleg" rows="2" placeholder="Gedetailleerde uitleg..."></textarea>
+
+        <button class="save-btn" onclick="opslaanOpdracht()">Opdracht Opslaan</button>
+    </div>
+</div>
+
+<script>
+    // Standaard ingebouwde opdrachten
+    const standaardStappen = {
+        "python rekenmachine": [
+            "Stap 1: Input van de gebruiker vragen (getallen en operator)",
+            "Stap 2: De 'if/elif/else' structuur bouwen voor de berekeningen",
+            "Stap 3: Controleren op fouten (zoals delen door 0)",
+            "Stap 4: De uitslag netjes printen in de terminal"
+        ]
+    };
+
+    // Laad opgeslagen data of gebruik de standaard data
+    function getDatabase() {
+        const opgeslagen = localStorage.getItem("stappenDB");
+        return opgeslagen ? JSON.parse(opgeslagen) : standaardStappen;
+    }
+
+    function wisselBeheerder() {
+        const panel = document.getElementById("adminPanel");
+        panel.style.display = (panel.style.display === "block") ? "none" : "block";
+    }
+
+    function updateStappen() {
+        const db = getDatabase();
+        const opdrachtInput = document.getElementById("opdracht").value.toLowerCase().trim();
+        const stapSelect = document.getElementById("stap");
+        
+        stapSelect.innerHTML = "";
+
+        if (db[opdrachtInput]) {
+            stapSelect.disabled = false;
+            db[opdrachtInput].forEach((stapTekst, index) => {
+                const optie = document.createElement("option");
+                optie.value = index + 1;
+                optie.textContent = stapTekst;
+                stapSelect.appendChild(optie);
+            });
+        } else {
+            stapSelect.disabled = true;
+            const standaardOptie = document.createElement("option");
+            standaardOptie.textContent = "Typ hierboven eerst een bekende opdracht in...";
+            stapSelect.appendChild(standardOptie);
+        }
+    }
+
+    function opslaanOpdracht() {
+        const naam = document.getElementById("new-opdracht").value.toLowerCase().trim();
+        if(!naam) return alert("Vul een opdrachtnaam in!");
+
+        const db = getDatabase();
+        
+        // Sla de titels op voor de dropdown
+        db[naam] = [
+            document.getElementById("s1-titel").value || "Stap 1",
+            document.getElementById("s2-titel").value || "Stap 2",
+            document.getElementById("s3-titel").value || "Stap 3",
+            document.getElementById("s4-titel").value || "Stap 4"
+        ];
+        localStorage.setItem("stappenDB", JSON.stringify(db));
+
+        // Sla ook direct de uitgebreide uitleg op voor hulp.html
+        const uitlegDb = localStorage.getItem("uitlegDB") ? JSON.parse(localStorage.getItem("uitlegDB")) : {};
+        uitlegDb[naam] = {
+            1: document.getElementById("s1-uitleg").value,
+            2: document.getElementById("s2-uitleg").value,
+            3: document.getElementById("s3-uitleg").value,
+            4: document.getElementById("s4-uitleg").value
+        };
+        localStorage.setItem("uitlegDB", JSON.stringify(uitlegDb));
+
+        alert("Opdracht succesvol opgeslagen!");
+        wisselBeheerder(); // Sluit paneel
+        updateStappen();
+    }
+
+    function stuurDoor() {
+        const opdrachtValue = document.getElementById("opdracht").value.trim();
+        const stapValue = document.getElementById("stap").value;
+        if (!opdrachtValue || !stapValue) return alert("Selecteer een geldige opdracht en stap!");
+        window.location.href = `hulp.html?opdracht=${encodeURIComponent(opdrachtValue)}&stap=${encodeURIComponent(stapValue)}`;
+    }
+</script>
+</body>
+</html>
+
+
+
